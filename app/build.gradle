@@ -17,12 +17,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Load keystore properties from file
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    }
+
     signingConfigs {
         release {
-            storeFile file('../protocolchat-release-key.keystore')
-            storePassword 'protocolchat123'
-            keyAlias 'protocolchat'
-            keyPassword 'protocolchat123'
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            def keystoreFile = keystoreProperties['storeFile']
+            if (keystoreFile) {
+                storeFile file("../$keystoreFile")
+            }
+            storePassword keystoreProperties['storePassword']
         }
     }
 
